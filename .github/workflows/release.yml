@@ -1,0 +1,42 @@
+name: Create Release with Code Export
+
+on:
+  push:
+    tags:
+      - 'v*' # Triggers only on tags starting with 'v'
+
+jobs:
+  create-release:
+    name: Create and Upload Release
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Create a ZIP file with the code
+      - name: Create ZIP Archive
+        run: |
+          zip -r code-export.zip ./*
+
+      # Upload the ZIP file to a GitHub release
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          body: |
+            This release contains the ZIP file of the repository code.
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+
+      - name: Upload ZIP to Release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./code-export.zip
+          asset_name: code-export.zip
+          asset_content_type: application/zip
