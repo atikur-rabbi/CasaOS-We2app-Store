@@ -1,0 +1,135 @@
+#
+# WARNING: Make sure to use the docker-compose.yml of the current release:
+#
+# https://github.com/immich-app/immich/releases/latest/download/docker-compose.yml
+#
+# The compose file on main may not be compatible with the latest release.
+#
+
+name: immich
+
+services:
+  immich:
+    deploy:
+      resources:
+        reservations:
+          memory: 2048M
+    container_name: immich
+    image: altran1502/immich-server:release
+    volumes:
+      - /DATA/Gallery/immich:/usr/src/app/upload
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      DB_DATABASE_NAME: immich
+      DB_PASSWORD: postgres
+      DB_USERNAME: postgres
+    ports:
+      - '2283:2283'
+    depends_on:
+      - redis
+      - database
+    restart: unless-stopped
+    healthcheck:
+      disable: false
+    networks:
+      - immich
+
+  immich-machine-learning:
+    container_name: immich-machine-learning
+    image: altran1502/immich-machine-learning:release
+    environment:
+      DB_DATABASE_NAME: immich
+      DB_PASSWORD: postgres
+      DB_USERNAME: postgres
+      # 使用代理下载图像识别模型
+      # HTTP_PROXY: http://172.17.0.1:10809
+      # HTTPS_PROXY: http://172.17.0.1:10809
+    restart: unless-stopped
+    volumes:
+      - /DATA/AppData/immich/model-cache:/cache
+    healthcheck:
+      disable: false
+    networks:
+      - immich
+
+  redis:
+    container_name: immich-redis
+    image: redis:6.2-alpine@sha256:eaba718fecd1196d88533de7ba49bf903ad33664a92debb24660a922ecd9cac8
+    healthcheck:
+      test: redis-cli ping || exit 1
+    volumes:
+      - /DATA/AppData/immich/redis:/data
+    restart: unless-stopped
+    networks:
+      - immich
+
+  database:
+    container_name: immich-postgres
+    image: tensorchord/pgvecto-rs:pg14-v0.2.0@sha256:90724186f0a3517cf6914295b5ab410db9ce23190a2d9d0b9dd6463e3fa298f0
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: immich
+      POSTGRES_INITDB_ARGS: '--data-checksums'
+    volumes:
+      - /DATA/AppData/immich/pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready --dbname='immich' --username='postgres' || exit 1; Chksum="$$(psql --dbname='immich' --username='postgres' --tuples-only --no-align --command='SELECT COALESCE(SUM(checksum_failures), 0) FROM pg_stat_database')"; echo "checksum failure count is $$Chksum"; [ "$$Chksum" = '0' ] || exit 1
+      interval: 5m
+      start_interval: 30s
+      start_period: 5m
+    command:
+      [
+        'postgres',
+        '-c',
+        'shared_preload_libraries=vectors.so',
+        '-c',
+        'search_path="$$user", public, vectors',
+        '-c',
+        'logging_collector=on',
+        '-c',
+        'max_wal_size=2GB',
+        '-c',
+        'shared_buffers=512MB',
+        '-c',
+        'wal_compression=on',
+      ]
+    restart: unless-stopped
+    networks:
+      - immich
+
+networks:
+  immich:
+    name: immich
+
+x-casaos:
+  architectures:
+    - amd64
+    - arm64
+  main: immich
+  store_app_id: immich
+  category: Gallery
+  author: We2app.com
+  developer: Atik
+  icon: https://cdn.jsdelivr.net/gh/Cp0204/CasaOS-AppStore-Play@main/Apps/immich/icon.png
+  screenshot_link:
+    - https://cdn.jsdelivr.net/gh/Cp0204/CasaOS-AppStore-Play@main/Apps/immich/screenshot-1.png
+  thumbnail: https://cdn.jsdelivr.net/gh/Cp0204/CasaOS-AppStore-Play@main/Apps/immich/thumbnail.png
+  description:
+    en_us: immich is a self-hosted photo and video backup solution for iOS and Android. It offers AI-powered features like object detection, people recognition, and location-based search, giving you complete control over your privacy and data.
+    zh_cn: immich 是一款适用于 iOS 和 Android 的自托管照片和视频备份解决方案。它提供了由 AI 支持的功能，例如对象检测、人物识别和基于位置的搜索，使您可以完全控制自己的隐私和数据。
+  tagline:
+    en_us: High performance self-hosted photo and video backup solution
+    zh_cn: 高性能的自托管照片和视频备份方案
+  title:
+    en_us: immich
+  tips:
+    before_install:
+      en_us: |
+        ⚠️ The project is under very active development.
+        ⚠️ Expect bugs and breaking changes.
+        ⚠️ Do not use the app as the only way to store your photos and videos.
+        ⚠️ Always follow 3-2-1 backup plan for your precious photos and videos!
+  port_map: "2283"
+  scheme: http
+  index: /
