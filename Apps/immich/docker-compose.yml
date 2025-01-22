@@ -93,7 +93,7 @@ x-casaos:
     - arm64
   main: immich
   store_app_id: immich
-  category: Gallery
+  category: We2app.com
   author: We2app.com
   developer: Atik
   icon: https://cdn.jsdelivr.net/gh/Cp0204/CasaOS-AppStore-Play@main/Apps/immich/icon.png
