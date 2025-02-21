@@ -44,6 +44,3 @@ jobs:
           draft: false # Set to true to create a draft release instead
           prerelease: false # Set to true to create a pre-release
 
-      - name: Print release URL
-        if: steps.create_release.outcome == 'success'
-        run: echo "Release URL: ${{ steps.create_release.outputs.html_url }}"
