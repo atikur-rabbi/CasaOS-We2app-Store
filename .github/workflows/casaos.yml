@@ -9,11 +9,45 @@ jobs:
   create-release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Required to create releases
+      contents: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Get Current Release Counter
+        id: get_counter
+        uses: actions/github-script@v6
+        with:
+          script: |
+            try {
+              const fs = require('fs');
+              const counter = parseInt(fs.readFileSync('./release_counter.txt', 'utf8'));
+              return counter;
+            } catch (error) {
+              return 0; // Start at 0 if file doesn't exist
+            }
+        outputs:
+          counter: ${{ steps.get_counter.outputs.result }}
+
+      - name: Increment Release Counter
+        id: increment_counter
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const newCounter = ${{ steps.get_counter.outputs.counter }} + 1;
+            fs.writeFileSync('./release_counter.txt', newCounter.toString());
+            return newCounter;
+        outputs:
+          new_counter: ${{ steps.increment_counter.outputs.result }}
+
+      - name: Commit Counter Update
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+          message: "Update release counter" # Add a commit message
 
       - name: Create Release
         id: create_release
@@ -21,15 +55,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ github.sha }} # Use commit SHA as tag
-          release_name: Release v${{ github.sha }} # Release name
+          tag_name: v1.${{ steps.increment_counter.outputs.new_counter }}-${{ github.sha }}
+          release_name: Release v1.${{ steps.increment_counter.outputs.new_counter }}-${{ github.sha }}
           body: |
             Automated release based on commit ${{ github.sha }}
 
             Changes in this release:
-            -  *(Add your changelog or commit messages here if needed)*
-            -  *(You can use `git log --pretty=format:"- %s" --abbrev-commit --no-merges` in a previous step to get commit messages)*
+            -  *(Add your changelog here)*
 
-          draft: false # Set to true to create a draft release instead
-          prerelease: false # Set to true to create a pre-release
-
+          draft: false
+          prerelease: false
