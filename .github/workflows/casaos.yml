@@ -1,0 +1,49 @@
+name: Create Release on Main Commit
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Required to create releases
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16  # Or your preferred Node.js version
+
+      - name: Install dependencies (if applicable)
+        run: npm ci # or yarn install or pnpm install
+
+      - name: Build project (if applicable)
+        run: npm run build # or yarn build or pnpm build - adjust as needed
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.sha }} # Use commit SHA as tag
+          release_name: Release v${{ github.sha }} # Release name
+          body: |
+            Automated release based on commit ${{ github.sha }}
+
+            Changes in this release:
+            -  *(Add your changelog or commit messages here if needed)*
+            -  *(You can use `git log --pretty=format:"- %s" --abbrev-commit --no-merges` in a previous step to get commit messages)*
+
+          draft: false # Set to true to create a draft release instead
+          prerelease: false # Set to true to create a pre-release
+
+      - name: Print release URL
+        if: steps.create_release.outcome == 'success'
+        run: echo "Release URL: ${{ steps.create_release.outputs.html_url }}"
