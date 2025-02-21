@@ -28,7 +28,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: v${{ github.sha }} # Use commit SHA as tag (recommended)
-          release_name: Release v${{ github.sha }} - ${{ steps.commit_message.outputs.message }} # Include commit message in release name
+          release_name: Release ${{ steps.commit_message.outputs.message }} # Include commit message in release name
           body: |
             Automated release based on commit ${{ github.sha }}
 
