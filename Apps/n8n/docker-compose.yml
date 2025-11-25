@@ -25,7 +25,7 @@ x-casaos:
   category: We2app
   description:
     en_us: n8n is a fair-code licensed workflow automation tool. It allows you to automate tasks across different services and APIs with a visual workflow editor. Connect apps and services together to create powerful automations without writing code.
-  developer: n8n.io
+  developer: We2app
   icon: https://cdn.jsdelivr.net/gh/atikur-rabbi/CasaOS-We2app-Store@main/Apps/n8n/icon.png
   screenshot_link:
     - https://raw.githubusercontent.com/n8n-io/n8n/master/assets/n8n-screenshot.png
