@@ -24,7 +24,7 @@ x-casaos:
     - arm64
   main: ollama
   store_app_id: ollama
-  category: We2app.com
+  category: We2app
   author: We2app.com
   developer: Ollama
   icon: https://cdn.jsdelivr.net/gh/Cp0204/CasaOS-AppStore-Play@main/Apps/ollama/icon.png

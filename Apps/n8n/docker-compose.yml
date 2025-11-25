@@ -22,7 +22,7 @@ x-casaos:
     - arm64
   main: n8n
   author: We2app Team
-  category: Automation
+  category: We2app
   description:
     en_us: n8n is a fair-code licensed workflow automation tool. It allows you to automate tasks across different services and APIs with a visual workflow editor. Connect apps and services together to create powerful automations without writing code.
   developer: n8n.io
