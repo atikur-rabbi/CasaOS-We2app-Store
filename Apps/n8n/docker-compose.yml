@@ -1,11 +1,11 @@
 name: n8n
 services:
-  n8n:
+  n8n-custom:
     image: we2app/n8n:latest
-    container_name: n8n
+    container_name: n8n-custom
     restart: unless-stopped
     ports:
-      - "5678:5678"
+      - "5679:5678"
     environment:
       - N8N_PORT=5678
       - NODE_ENV=production
@@ -20,7 +20,7 @@ x-casaos:
   architectures:
     - amd64
     - arm64
-  main: n8n
+  main: n8n-custom
   author: We2app Team
   category: We2app
   description:
@@ -33,11 +33,11 @@ x-casaos:
     en_us: Workflow automation tool for technical people
   thumbnail: https://cdn.jsdelivr.net/gh/atikur-rabbi/CasaOS-We2app-Store@main/Apps/n8n/icon.png
   title:
-    en_us: n8n
+    en_us: n8n-custom
   index: /
   port_map: "5678"
   scheme: http
-  store_app_id: n8n
+  store_app_id: n8n-custom
   tips:
     before_install:
       en_us: |
