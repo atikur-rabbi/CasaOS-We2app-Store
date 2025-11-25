@@ -1,4 +1,4 @@
-name: n8n
+name: n8n-custom
 services:
   n8n-custom:
     image: we2app/n8n:latest
