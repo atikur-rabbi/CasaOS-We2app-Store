@@ -1,0 +1,48 @@
+name: n8n
+services:
+  n8n:
+    image: we2app/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_PORT=5678
+      - NODE_ENV=production
+      - WEBHOOK_URL=https://n8n.example.com/
+      - GENERIC_TIMEZONE=UTC
+    volumes:
+      - /DATA/AppData/$AppID/data:/home/node/.n8n
+    network_mode: bridge
+    privileged: false
+
+x-casaos:
+  architectures:
+    - amd64
+    - arm64
+  main: n8n
+  author: We2app Team
+  category: Automation
+  description:
+    en_us: n8n is a fair-code licensed workflow automation tool. It allows you to automate tasks across different services and APIs with a visual workflow editor. Connect apps and services together to create powerful automations without writing code.
+  developer: n8n.io
+  icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/n8n.png
+  screenshot_link:
+    - https://raw.githubusercontent.com/n8n-io/n8n/master/assets/n8n-screenshot.png
+  tagline:
+    en_us: Workflow automation tool for technical people
+  thumbnail: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/n8n.png
+  title:
+    en_us: n8n
+  index: /
+  port_map: "5678"
+  scheme: http
+  store_app_id: n8n
+  tips:
+    before_install:
+      en_us: |
+        Default Configuration:
+        - Web UI will be available at http://your-server-ip:5678
+        - Data is stored in /DATA/AppData/n8n/data
+        - Change WEBHOOK_URL to your actual domain if using webhooks
+        - Set GENERIC_TIMEZONE to your local timezone
